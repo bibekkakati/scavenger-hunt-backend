@@ -138,7 +138,7 @@ const getBranchByUsername = async (username) => {
 	try {
 		const q = `SELECT * FROM ${BRANCH_TABLE} WHERE username = ($1)`;
 		const result = await query(q, [username]);
-		return [result.rows, null];
+		return [result.rows[0], null];
 	} catch (error) {
 		return [null, "Something went wrong"];
 	}
@@ -199,6 +199,29 @@ const getNotificationCount = async (username) => {
 	}
 };
 
+const getNotificationsByUsername = async (username) => {
+	try {
+		const q = `SELECT count FROM ${NOTIFICATION_TABLE} WHERE username = ($1) ORDER BY timestamp`;
+		const result = await query(q, [username]);
+		if (result?.rowCount) {
+			const data = result.rows;
+			const unreads = [];
+			const reads = [];
+			for (let i = 0; i < data.length; i++) {
+				if (data[i].status) {
+					reads.push(data[i]);
+				} else {
+					unreads.push(data[i]);
+				}
+			}
+			return [{ reads, unreads }, null];
+		}
+		return [null, "Invalid username"];
+	} catch (error) {
+		return [null, "Something went wrong"];
+	}
+};
+
 module.exports = {
 	createTables,
 	createUser,
@@ -211,4 +234,5 @@ module.exports = {
 	insertNotification,
 	markNotificationAsRead,
 	getNotificationCount,
+	getNotificationsByUsername,
 };

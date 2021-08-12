@@ -11,13 +11,15 @@ const queries = require("./db/queries");
 queries.createTables();
 
 // Importing Routes
-const { authRoutes } = require("./routes");
+const { authRoutes, branchRoutes, notificationRoutes } = require("./routes");
 
 // Home Route
 app.get("/", (req, res) => res.send("Welcome to Scavenger Hunt"));
 
 // Auth Routes
 app.use("/auth", authRoutes);
+app.use("/branch", branchRoutes);
+app.use("/notification", notificationRoutes);
 
 // Server Listening at Specified Port
 const port = process.env.PORT || 5000;
