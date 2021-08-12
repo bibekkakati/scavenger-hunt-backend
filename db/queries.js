@@ -126,7 +126,6 @@ const getBranchesByPincode = async (pincode) => {
 
 		q = `SELECT * FROM ${BRANCH_TABLE} WHERE branchid IN ${popStr}`;
 		result = await query(q, branchIds);
-		console.log("2222", result);
 		if (!result?.rowCount) return [null, "Pincode not found"];
 		return [result.rows, null];
 	} catch (error) {
@@ -155,6 +154,51 @@ const getAllBranches = async () => {
 	}
 };
 
+const insertNotification = async (username, message) => {
+	let q, result;
+	try {
+		q = `INSERT INTO ${NOTIFICATION_TABLE}(username, message, timestamp) VALUES($1, $2, $3)`;
+		result = await query(q, [username, message, Date.now()]);
+		if (result.rowCount) {
+			q = `UPDATE ${NOTIFICATION_COUNT_TABLE} SET count = count + 1 WHERE username = ($1)`;
+			await query(q, [username]);
+			return [true, null];
+		}
+		return [null, "Couldn't create notification"];
+	} catch (error) {
+		return [null, "Something went wrong"];
+	}
+};
+
+const markNotificationAsRead = async (id, username) => {
+	let q, result;
+	try {
+		q = `UPDATE ${NOTIFICATION_TABLE} SET status = ($1) WHERE id = ($2)`;
+		result = await query(q, [1, id]);
+		if (result.rowCount) {
+			q = `UPDATE ${NOTIFICATION_COUNT_TABLE} SET count = count - 1 WHERE username = ($1)`;
+			await query(q, [username]);
+			return [true, null];
+		}
+		return [null, "Couldn't update notification status"];
+	} catch (error) {
+		return [null, "Something went wrong"];
+	}
+};
+
+const getNotificationCount = async (username) => {
+	try {
+		const q = `SELECT count FROM ${NOTIFICATION_COUNT_TABLE} WHERE username = ($1)`;
+		const result = await query(q, [username]);
+		if (result?.rowCount) {
+			return [result.rows[0], null];
+		}
+		return [null, "Invalid username"];
+	} catch (error) {
+		return [null, "Something went wrong"];
+	}
+};
+
 module.exports = {
 	createTables,
 	createUser,
@@ -164,4 +208,7 @@ module.exports = {
 	getBranchesByPincode,
 	getAllBranches,
 	getBranchByUsername,
+	insertNotification,
+	markNotificationAsRead,
+	getNotificationCount,
 };
