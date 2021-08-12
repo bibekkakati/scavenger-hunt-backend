@@ -1,7 +1,11 @@
 require("dotenv").config();
-const express = require("express");
-const app = express();
 
+const express = require("express");
+const cors = require("cors");
+const app = express();
+const server = require("http").createServer(app);
+
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -23,7 +27,7 @@ app.use("/notification", notificationRoutes);
 
 // Server Listening at Specified Port
 const port = process.env.PORT || 5000;
-app.listen(port, () => {
+server.listen(port, () => {
 	console.log(`Server is listening at http://localhost:${port}`);
 });
 
@@ -36,3 +40,5 @@ handleExit = async (signal) => {
 process.on("SIGINT", handleExit);
 process.on("SIGQUIT", handleExit);
 process.on("SIGTERM", handleExit);
+
+module.exports = server;

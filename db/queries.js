@@ -191,7 +191,7 @@ const getNotificationCount = async (username) => {
 		const q = `SELECT count FROM ${NOTIFICATION_COUNT_TABLE} WHERE username = ($1)`;
 		const result = await query(q, [username]);
 		if (result?.rowCount) {
-			return [result.rows[0], null];
+			return [result.rows[0].count, null];
 		}
 		return [null, "Invalid username"];
 	} catch (error) {
