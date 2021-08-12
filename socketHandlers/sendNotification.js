@@ -5,7 +5,7 @@ const sendNotification = async (username, message) => {
 		if (username) {
 			const socket = SocketStore.get(username);
 			if (!socket) return;
-			return socket.emit("notification:message", message);
+			if (message) return socket.emit("notification:message", message);
 		}
 	} catch (error) {
 		return error;

@@ -11,9 +11,10 @@ const io = require("socket.io")(server, options);
 const onConnection = (socket) => {
 	if (socket.username) {
 		SocketStore.add(username, socket);
+		// sendNotificationCount(username);
+
 		socket.on("disconnect", () => SocketStore.remove(username));
 		socket.on("close", () => SocketStore.remove(username));
-		sendNotificationCount(username);
 	}
 };
 
