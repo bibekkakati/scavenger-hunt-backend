@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -27,7 +28,7 @@ app.use("/branch", branchRoutes);
 app.use("/notification", notificationRoutes);
 
 // Server Listening at Specified Port
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5400;
 server.listen(port, () => {
 	console.log(`Server is listening at http://localhost:${port}`);
 });
