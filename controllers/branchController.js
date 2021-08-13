@@ -7,12 +7,11 @@ const {
 } = require("../emitters/NotificationEmitter");
 
 const writeNotification = async (usernames = [], message = "") => {
-	console.log(usernames, message);
-	for (let i = 0; i < usernames.length; i++) {
-		DB.insertNotification(usernames[i], message);
+	const [response, error] = await DB.insertNotification(usernames, message);
+	if (response) {
+		notifyMessageToUsernames(usernames, message);
+		notifyCountToUsernames(usernames);
 	}
-	notifyMessageToUsernames(usernames, message);
-	notifyCountToUsernames(usernames);
 };
 
 const searchBranchByPincode = async (req, res) => {

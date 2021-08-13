@@ -164,14 +164,30 @@ const getAllBranches = async () => {
 	}
 };
 
-const insertNotification = async (username, message) => {
+const insertNotification = async (usernames = [], message) => {
 	let q, result;
 	try {
-		q = `INSERT INTO ${NOTIFICATION_TABLE}(username, message, timestamp) VALUES($1, $2, $3)`;
-		result = await query(q, [username, message, Date.now()]);
+		const timestamp = Date.now();
+		let popStr = "";
+		const payload = [];
+		for (let i = 0; i < usernames.length; i++) {
+			payload.push(usernames[i], message, timestamp);
+			popStr += "($1, $2, $3)";
+			if (i < usernames.length - 1) popStr += ",";
+		}
+		q = `INSERT INTO ${NOTIFICATION_TABLE}(username, message, timestamp) VALUES ${popStr}`;
+		result = await query(q, payload);
+		popStr = "(";
+		for (let i = 1; i <= usernames.length; i++) {
+			if (i === usernames.length) {
+				popStr += `$${i})`;
+				break;
+			}
+			popStr += `$${i},`;
+		}
 		if (result.rowCount) {
-			q = `UPDATE ${NOTIFICATION_COUNT_TABLE} SET count = count + 1 WHERE username = ($1)`;
-			await query(q, [username]);
+			q = `UPDATE ${NOTIFICATION_COUNT_TABLE} SET count = count + 1 WHERE username IN ${popStr}`;
+			await query(q, usernames);
 			return [true, null];
 		}
 		return [null, "Couldn't create notification"];
