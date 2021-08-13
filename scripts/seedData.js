@@ -13,9 +13,10 @@ const DataSheet = XLSX.readFile("./scripts/Data.xlsx");
 const sheets = DataSheet.SheetNames;
 const data = XLSX.utils.sheet_to_json(DataSheet.Sheets[sheets[0]]);
 const password = "$2a$10$481wmZr56QLk4F..H.1vUukFXIU5HpLXz72t/rxhcOzx8rJ/v6XG2";
-const alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-const db = require("../db/config");
-const seed = async () => {
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const nanoid = customAlphabet(chars, 10);
+
+const seedData = async () => {
 	await createTables();
 	await createUser(Admin.adminUsername, password, Roles.admin);
 	await prepareNotificationCountTable(Admin.adminUsername);
@@ -29,7 +30,7 @@ const seed = async () => {
 		const inchargename = branchDetails["Branch Incharge"];
 		const pincode = branchDetails["Pincode covered"].toString();
 		const pincodeList = pincode.split(",");
-		const username = customAlphabet(alphabets, 10);
+		const username = nanoid();
 		await createUser(username, password, Roles.branch);
 		await prepareNotificationCountTable(username);
 		const branchid = await createBranch(
@@ -42,9 +43,10 @@ const seed = async () => {
 			inchargename
 		);
 		for (let j = 0; j < pincodeList.length; j++) {
-			await insertBranchPincodeMap(pincodeList[j], branchid);
+			const pin = parseInt(pincodeList[j].trim());
+			if (!isNaN(pin)) await insertBranchPincodeMap(pin, branchid);
 		}
 	}
 };
 
-seed();
+module.exports = seedData;

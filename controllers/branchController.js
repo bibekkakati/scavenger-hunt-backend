@@ -10,8 +10,11 @@ const writeNotification = async (usernames = [], message = "") => {
 	const [data, error] = await DB.insertNotification(usernames, message);
 	if (data?.length) {
 		for (let i = 0; i < data.length; i++) {
-			notifyMessageToUsername(usernames[i], { id: data[i].id, message });
-			notifyCountToUsername(usernames[i]);
+			notifyMessageToUsername(data[i].username, {
+				id: data[i].id,
+				message,
+			});
+			notifyCountToUsername(data[i].username);
 		}
 	}
 };

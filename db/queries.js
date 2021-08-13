@@ -9,11 +9,11 @@ const NOTIFICATION_COUNT_TABLE = "notification_count_table";
 const createTables = async () => {
 	let q = "";
 	try {
-		q = `CREATE TABLE IF NOT EXISTS ${USER_TABLE} (username VARCHAR(8) PRIMARY KEY, password TEXT NOT NULL, role VARCHAR(10) NOT NULL)`;
+		q = `CREATE TABLE IF NOT EXISTS ${USER_TABLE} (username VARCHAR(16) PRIMARY KEY, password TEXT NOT NULL, role VARCHAR(16) NOT NULL)`;
 		await query(q);
 		console.log("Created USER TABLE");
 
-		q = `CREATE TABLE IF NOT EXISTS ${BRANCH_TABLE} (branchid SERIAL PRIMARY KEY, username VARCHAR(8) NOT NULL, institutionname TEXT, branchname TEXT, address TEXT, city TEXT, contact TEXT, inchargename TEXT)`;
+		q = `CREATE TABLE IF NOT EXISTS ${BRANCH_TABLE} (branchid SERIAL PRIMARY KEY, username VARCHAR(16) NOT NULL, institutionname TEXT, branchname TEXT, address TEXT, city TEXT, contact TEXT, inchargename TEXT)`;
 		await query(q);
 		console.log("Created BRANCH TABLE");
 		q = `CREATE INDEX ON ${BRANCH_TABLE} (username)`;
@@ -24,14 +24,14 @@ const createTables = async () => {
 		await query(q);
 		console.log("Created PINCODE TABLE");
 
-		q = `CREATE TABLE IF NOT EXISTS ${NOTIFICATION_TABLE} (id SERIAL PRIMARY KEY, username VARCHAR(8) NOT NULL, message TEXT NOT NULL, status SMALLINT DEFAULT 0, timestamp BIGINT)`;
+		q = `CREATE TABLE IF NOT EXISTS ${NOTIFICATION_TABLE} (id SERIAL PRIMARY KEY, username VARCHAR(16) NOT NULL, message TEXT NOT NULL, status SMALLINT DEFAULT 0, timestamp BIGINT)`;
 		await query(q);
 		console.log("Created NOTIFICATION TABLE");
 		q = `CREATE INDEX ON ${NOTIFICATION_TABLE} (username)`;
 		await query(q);
 		console.log("Indexed NOTIFICATION TABLE");
 
-		q = `CREATE TABLE IF NOT EXISTS ${NOTIFICATION_COUNT_TABLE} (username VARCHAR(8) PRIMARY KEY, count INT DEFAULT 0)`;
+		q = `CREATE TABLE IF NOT EXISTS ${NOTIFICATION_COUNT_TABLE} (username VARCHAR(16) PRIMARY KEY, count INT DEFAULT 0)`;
 		await query(q);
 		console.log("Created NOTIFICATION COUNT TABLE");
 	} catch (error) {
@@ -51,7 +51,7 @@ const createUser = async (username, password, role) => {
 
 const prepareNotificationCountTable = async (username) => {
 	try {
-		const q = `INSERT INTO ${NOTIFICATION_COUNT_TABLE}(username, password) VALUES($1, $2)`;
+		const q = `INSERT INTO ${NOTIFICATION_COUNT_TABLE}(username, count) VALUES($1, $2)`;
 		await query(q, [username, 0]);
 		console.log("Prepared Notification Count");
 	} catch (error) {
@@ -170,12 +170,17 @@ const insertNotification = async (usernames = [], message) => {
 		const timestamp = Date.now();
 		let popStr = "";
 		const payload = [];
+		let idx = 1;
 		for (let i = 0; i < usernames.length; i++) {
 			payload.push(usernames[i], message, timestamp);
-			popStr += "($1, $2, $3)";
+			popStr += "(";
+			popStr += `$${idx++},`;
+			popStr += `$${idx++},`;
+			popStr += `$${idx++}`;
+			popStr += ")";
 			if (i < usernames.length - 1) popStr += ",";
 		}
-		q = `INSERT INTO ${NOTIFICATION_TABLE}(username, message, timestamp) VALUES ${popStr} RETURNING id`;
+		q = `INSERT INTO ${NOTIFICATION_TABLE}(username, message, timestamp) VALUES ${popStr} RETURNING id, username`;
 		result = await query(q, payload);
 		popStr = "(";
 		for (let i = 1; i <= usernames.length; i++) {
@@ -192,6 +197,7 @@ const insertNotification = async (usernames = [], message) => {
 		}
 		return [null, "Couldn't create notification"];
 	} catch (error) {
+		console.log(error);
 		return [null, "Something went wrong"];
 	}
 };
