@@ -1,5 +1,5 @@
 const DB = require("../db/queries");
-const { notifyCountToUsernames } = require("../emitters/NotificationEmitter");
+const { notifyCountToUsername } = require("../emitters/NotificationEmitter");
 
 const getAllNotifications = async (req, res) => {
 	try {
@@ -29,7 +29,7 @@ const markNotificationAsRead = async (req, res) => {
 
 		const [data, error] = await DB.markNotificationAsRead(id, username);
 
-		notifyCountToUsernames([username]);
+		notifyCountToUsername(username);
 
 		if (error) throw new Error(error);
 		return res.send({

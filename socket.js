@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { notifyCountToUsernames } = require("./emitters/NotificationEmitter");
+const { notifyCountToUsername } = require("./emitters/NotificationEmitter");
 const verifySocketToken = require("./middlewares/verifySocketToken");
 const server = require("./server");
 
@@ -15,7 +15,7 @@ const onConnection = (socket) => {
 	const username = socket.username;
 	if (username) {
 		SocketStore.add(username, socket);
-		notifyCountToUsernames([username]);
+		notifyCountToUsername(username);
 
 		socket.on("disconnect", () => SocketStore.remove(username));
 		socket.on("close", () => SocketStore.remove(username));

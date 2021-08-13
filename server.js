@@ -9,8 +9,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // PostgreSQL Connection
 const db = require("./db/config");
-const queries = require("./db/queries");
-queries.createTables();
 
 // Importing Routes
 const { authRoutes, branchRoutes, notificationRoutes } = require("./routes");

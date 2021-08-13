@@ -2,15 +2,17 @@ const Admin = require("../constants/Admin");
 const Roles = require("../constants/Roles");
 const DB = require("../db/queries");
 const {
-	notifyMessageToUsernames,
-	notifyCountToUsernames,
+	notifyMessageToUsername,
+	notifyCountToUsername,
 } = require("../emitters/NotificationEmitter");
 
 const writeNotification = async (usernames = [], message = "") => {
-	const [response, error] = await DB.insertNotification(usernames, message);
-	if (response) {
-		notifyMessageToUsernames(usernames, message);
-		notifyCountToUsernames(usernames);
+	const [data, error] = await DB.insertNotification(usernames, message);
+	if (data?.length) {
+		for (let i = 0; i < data.length; i++) {
+			notifyMessageToUsername(usernames[i], { id: data[i].id, message });
+			notifyCountToUsername(usernames[i]);
+		}
 	}
 };
 

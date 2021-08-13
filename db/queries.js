@@ -76,8 +76,8 @@ const createBranch = async (
 			address,
 			city,
 			contact,
-			inchargename) VALUES($1, $2, $3, $4, $5, $6, $7)`;
-		await query(q, [
+			inchargename) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING branchid`;
+		const result = await query(q, [
 			username,
 			institutionname,
 			branchname,
@@ -86,7 +86,7 @@ const createBranch = async (
 			contact,
 			inchargename,
 		]);
-		console.log("Branch Created");
+		return result.rows[0].branchid;
 	} catch (error) {
 		console.log(error);
 	}
@@ -175,7 +175,7 @@ const insertNotification = async (usernames = [], message) => {
 			popStr += "($1, $2, $3)";
 			if (i < usernames.length - 1) popStr += ",";
 		}
-		q = `INSERT INTO ${NOTIFICATION_TABLE}(username, message, timestamp) VALUES ${popStr}`;
+		q = `INSERT INTO ${NOTIFICATION_TABLE}(username, message, timestamp) VALUES ${popStr} RETURNING id`;
 		result = await query(q, payload);
 		popStr = "(";
 		for (let i = 1; i <= usernames.length; i++) {
@@ -188,7 +188,7 @@ const insertNotification = async (usernames = [], message) => {
 		if (result.rowCount) {
 			q = `UPDATE ${NOTIFICATION_COUNT_TABLE} SET count = count + 1 WHERE username IN ${popStr}`;
 			await query(q, usernames);
-			return [true, null];
+			return [result.rows, null];
 		}
 		return [null, "Couldn't create notification"];
 	} catch (error) {
@@ -227,7 +227,7 @@ const getNotificationCount = async (username) => {
 
 const getNotificationsByUsername = async (username) => {
 	try {
-		const q = `SELECT count FROM ${NOTIFICATION_TABLE} WHERE username = ($1) ORDER BY timestamp`;
+		const q = `SELECT id, message, status FROM ${NOTIFICATION_TABLE} WHERE username = ($1) ORDER BY timestamp`;
 		const result = await query(q, [username]);
 		if (result?.rowCount) {
 			const data = result.rows;

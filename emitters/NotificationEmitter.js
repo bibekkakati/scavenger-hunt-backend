@@ -7,30 +7,26 @@ const {
 
 const NotificationEmitter = new events.EventEmitter();
 
-NotificationEmitter.addListener(Events.NotificationCount, async (usernames) => {
-	for (let i = 0; i < usernames.length; i++) {
-		sendNotificationCount(usernames[i]);
-	}
+NotificationEmitter.addListener(Events.NotificationCount, async (username) => {
+	sendNotificationCount(username);
 });
 
 NotificationEmitter.addListener(
 	Events.NotificationMessage,
-	async (usernames, message) => {
-		for (let i = 0; i < usernames.length; i++) {
-			sendNotification(usernames[i], message);
-		}
+	async (username, message) => {
+		sendNotification(username, message);
 	}
 );
 
-const notifyCountToUsernames = async (usernames = []) => {
-	NotificationEmitter.emit(Events.NotificationCount, usernames);
+const notifyCountToUsername = async (username) => {
+	NotificationEmitter.emit(Events.NotificationCount, username);
 };
 
-const notifyMessageToUsernames = async (usernames = [], message = "") => {
-	NotificationEmitter.emit(Events.NotificationMessage, usernames, message);
+const notifyMessageToUsername = async (username, message = {}) => {
+	NotificationEmitter.emit(Events.NotificationMessage, username, message);
 };
 
 module.exports = {
-	notifyCountToUsernames,
-	notifyMessageToUsernames,
+	notifyCountToUsername,
+	notifyMessageToUsername,
 };
