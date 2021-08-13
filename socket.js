@@ -1,17 +1,21 @@
+require("dotenv").config();
+const { notifyCountToUsernames } = require("./emitters/NotificationEmitter");
 const verifySocketToken = require("./middlewares/verifySocketToken");
 const server = require("./server");
-const { sendNotificationCount } = require("./socketHandlers");
+
 const SocketStore = require("./store/SocketStore");
 const options = {
 	cors: {
 		origin: "*",
 	},
 };
+
 const io = require("socket.io")(server, options);
 const onConnection = (socket) => {
-	if (socket.username) {
+	const username = socket.username;
+	if (username) {
 		SocketStore.add(username, socket);
-		// sendNotificationCount(username);
+		notifyCountToUsernames([username]);
 
 		socket.on("disconnect", () => SocketStore.remove(username));
 		socket.on("close", () => SocketStore.remove(username));

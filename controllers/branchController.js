@@ -1,5 +1,19 @@
+const Admin = require("../constants/Admin");
 const Roles = require("../constants/Roles");
 const DB = require("../db/queries");
+const {
+	notifyMessageToUsernames,
+	notifyCountToUsernames,
+} = require("../emitters/NotificationEmitter");
+
+const writeNotification = async (usernames = [], message = "") => {
+	console.log(usernames, message);
+	for (let i = 0; i < usernames.length; i++) {
+		DB.insertNotification(usernames[i], message);
+	}
+	notifyMessageToUsernames(usernames, message);
+	notifyCountToUsernames(usernames);
+};
 
 const searchBranchByPincode = async (req, res) => {
 	try {
@@ -7,16 +21,26 @@ const searchBranchByPincode = async (req, res) => {
 		if (!pincode) throw new Error("Pincode is required");
 
 		const [data, error] = await DB.getBranchesByPincode(pincode);
-
-		// TODO: notify admin
+		const message = `Someone searched @${pincode}`;
+		// Notifying Admin
+		writeNotification([Admin.adminUsername], message);
 
 		if (error) throw new Error(error);
 
-		// TODO: notify branch userids
+		const branchUsernames = [];
+		const branches = [];
+		for (let i = 0; i < data.length; i++) {
+			const temp = data[i];
+			branchUsernames.push(temp.username);
+			delete temp.username;
+			branches.push(temp);
+		}
+		// Notifying Branches
+		writeNotification(branchUsernames, message);
 
 		return res.send({
 			success: true,
-			data,
+			data: branches,
 		});
 	} catch (error) {
 		return res.send({

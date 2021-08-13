@@ -24,7 +24,7 @@ const createTables = async () => {
 		await query(q);
 		console.log("Created PINCODE TABLE");
 
-		q = `CREATE TABLE IF NOT EXISTS ${NOTIFICATION_TABLE} (id SERIAL PRIMARY KEY, username VARCHAR(8) NOT NULL, message TEXT NOT NULL, status SMALLINT DEFAULT 0, timestamp INT)`;
+		q = `CREATE TABLE IF NOT EXISTS ${NOTIFICATION_TABLE} (id SERIAL PRIMARY KEY, username VARCHAR(8) NOT NULL, message TEXT NOT NULL, status SMALLINT DEFAULT 0, timestamp BIGINT)`;
 		await query(q);
 		console.log("Created NOTIFICATION TABLE");
 		q = `CREATE INDEX ON ${NOTIFICATION_TABLE} (username)`;
@@ -44,6 +44,16 @@ const createUser = async (username, password, role) => {
 		const q = `INSERT INTO ${USER_TABLE}(username, password, role) VALUES($1, $2, $3)`;
 		await query(q, [username, password, role]);
 		console.log("User Created");
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+const prepareNotificationCountTable = async (username) => {
+	try {
+		const q = `INSERT INTO ${NOTIFICATION_COUNT_TABLE}(username, password) VALUES($1, $2)`;
+		await query(q, [username, 0]);
+		console.log("Prepared Notification Count");
 	} catch (error) {
 		console.log(error);
 	}
@@ -136,9 +146,9 @@ const getBranchesByPincode = async (pincode) => {
 
 const getBranchByUsername = async (username) => {
 	try {
-		const q = `SELECT * FROM ${BRANCH_TABLE} WHERE username = ($1)`;
+		const q = `SELECT branchid, branchname, address, city, contact, inchargename, institutionname FROM ${BRANCH_TABLE} WHERE username = ($1)`;
 		const result = await query(q, [username]);
-		return [result.rows[0], null];
+		return [result.rows, null];
 	} catch (error) {
 		return [null, "Something went wrong"];
 	}
@@ -146,7 +156,7 @@ const getBranchByUsername = async (username) => {
 
 const getAllBranches = async () => {
 	try {
-		const q = `SELECT * FROM ${BRANCH_TABLE}`;
+		const q = `SELECT branchid, branchname, address, city, contact, inchargename, institutionname FROM ${BRANCH_TABLE}`;
 		const result = await query(q, []);
 		return [result.rows, null];
 	} catch (error) {
@@ -225,6 +235,7 @@ const getNotificationsByUsername = async (username) => {
 module.exports = {
 	createTables,
 	createUser,
+	prepareNotificationCountTable,
 	createBranch,
 	insertBranchPincodeMap,
 	getUser,

@@ -25,6 +25,7 @@ const verifyAuthToken = (req, res, next) => {
 			return res.send({
 				success: false,
 				message: "Token expired",
+				expired: true,
 			});
 		}
 		return res.send({
