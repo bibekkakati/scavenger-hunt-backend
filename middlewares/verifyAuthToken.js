@@ -1,6 +1,4 @@
 const jwt = require("jsonwebtoken");
-
-const algorithm = process.env.JWT_ALGO;
 const secret = process.env.JWT_SECRET;
 
 const verifyAuthToken = (req, res, next) => {
@@ -8,9 +6,7 @@ const verifyAuthToken = (req, res, next) => {
 		let token = req.headers.authorization;
 		if (token && token.startsWith("Bearer ")) {
 			token = token.substring(7, token.length);
-			const payload = jwt.verify(token, secret, {
-				algorithms: [algorithm],
-			});
+			const payload = jwt.verify(token, secret);
 			req.body.username = payload.username;
 			req.body.role = payload.role;
 			return next();

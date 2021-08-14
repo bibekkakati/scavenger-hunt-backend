@@ -6,9 +6,7 @@ const secret = process.env.JWT_SECRET;
 const verifySocketToken = (token) => {
 	try {
 		if (token) {
-			const payload = jwt.verify(token, secret, {
-				algorithms: [algorithm],
-			});
+			const payload = jwt.verify(token, secret);
 			return payload.username;
 		}
 		return false;
