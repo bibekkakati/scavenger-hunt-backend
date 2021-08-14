@@ -26,7 +26,7 @@ const searchBranchByPincode = async (req, res) => {
 		if (!pincode) throw new Error("Pincode is required");
 
 		const [data, error] = await DB.getBranchesByPincode(pincode);
-		const message = `Someone searched @${pincode}`;
+		const message = `Someone searched for ${pincode}`;
 		// Notifying Admin
 		writeNotification([Admin.adminUsername], message);
 

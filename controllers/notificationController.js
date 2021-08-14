@@ -20,6 +20,25 @@ const getAllNotifications = async (req, res) => {
 	}
 };
 
+const getNotificationCount = async (req, res) => {
+	try {
+		const { username } = req.body;
+		if (!username) throw new Error("Username is not present in token");
+
+		const [count, error] = await DB.getNotificationCount(username);
+		if (error) throw new Error(error);
+		return res.send({
+			success: true,
+			count,
+		});
+	} catch (error) {
+		return res.send({
+			success: false,
+			message: error?.message || error,
+		});
+	}
+};
+
 const markNotificationAsRead = async (req, res) => {
 	try {
 		const { username } = req.body;
@@ -46,4 +65,5 @@ const markNotificationAsRead = async (req, res) => {
 module.exports = {
 	getAllNotifications,
 	markNotificationAsRead,
+	getNotificationCount,
 };
