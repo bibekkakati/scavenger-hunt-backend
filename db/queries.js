@@ -233,7 +233,7 @@ const getNotificationCount = async (username) => {
 
 const getNotificationsByUsername = async (username) => {
 	try {
-		const q = `SELECT id, message, status, timestamp FROM ${NOTIFICATION_TABLE} WHERE username = ($1) ORDER BY timestamp DESC`;
+		const q = `SELECT id, message, status, timestamp FROM ${NOTIFICATION_TABLE} WHERE username = ($1) ORDER BY timestamp ASC`;
 		const result = await query(q, [username]);
 		if (result?.rowCount) {
 			const data = result.rows;
