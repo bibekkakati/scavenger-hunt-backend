@@ -2,9 +2,9 @@
 	"name": "super-procure-task",
 	"version": "1.0.0",
 	"description": "Scavenger Hunt",
-	"main": "server.js",
+	"main": "socket.js",
 	"scripts": {
-		"start": "nodemon socket.js"
+		"start": "node socket.js"
 	},
 	"author": "Bibek",
 	"license": "ISC",
