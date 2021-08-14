@@ -1,15 +1,14 @@
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
 
-const publicKey = fs.readFileSync("./keys/rsa_public.pem");
 const algorithm = process.env.JWT_ALGO;
+const secret = process.env.JWT_SECRET;
 
 const verifyAuthToken = (req, res, next) => {
 	try {
 		let token = req.headers.authorization;
 		if (token && token.startsWith("Bearer ")) {
 			token = token.substring(7, token.length);
-			const payload = jwt.verify(token, publicKey, {
+			const payload = jwt.verify(token, secret, {
 				algorithms: [algorithm],
 			});
 			req.body.username = payload.username;
@@ -31,6 +30,7 @@ const verifyAuthToken = (req, res, next) => {
 		return res.send({
 			success: false,
 			message: "Authentication failed",
+			expired: true,
 		});
 	}
 };

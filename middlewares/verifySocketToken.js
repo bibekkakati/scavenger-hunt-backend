@@ -1,13 +1,12 @@
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
 
-const publicKey = fs.readFileSync("./keys/rsa_public.pem");
 const algorithm = process.env.JWT_ALGO;
+const secret = process.env.JWT_SECRET;
 
 const verifySocketToken = (token) => {
 	try {
 		if (token) {
-			const payload = jwt.verify(token, publicKey, {
+			const payload = jwt.verify(token, secret, {
 				algorithms: [algorithm],
 			});
 			return payload.username;
