@@ -13,14 +13,6 @@ const db = require("./db/config");
 
 // Importing Routes
 const { authRoutes, branchRoutes, notificationRoutes } = require("./routes");
-const seedData = require("./scripts/seedData");
-
-// Home Route
-app.get("/", (req, res) => res.send("Welcome to Scavenger Hunt"));
-app.get("/seed", (req, res) => {
-	res.send("seeding..");
-	seedData();
-});
 
 // Auth Routes
 app.use("/auth", authRoutes);

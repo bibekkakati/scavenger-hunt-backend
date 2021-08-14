@@ -8,6 +8,7 @@ const options = {
 	cors: {
 		origin: "*",
 	},
+	path: "/",
 };
 
 const io = require("socket.io")(server, options);
