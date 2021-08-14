@@ -14,6 +14,8 @@ const db = require("./db/config");
 // Importing Routes
 const { authRoutes, branchRoutes, notificationRoutes } = require("./routes");
 
+app.get("/", (req, res) => res.send("Welcome to Scavenger Hunt"));
+
 // Auth Routes
 app.use("/auth", authRoutes);
 app.use("/branch", branchRoutes);
