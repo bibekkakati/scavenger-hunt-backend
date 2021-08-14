@@ -12,7 +12,8 @@ const writeNotification = async (usernames = [], message = "") => {
 		for (let i = 0; i < data.length; i++) {
 			notifyMessageToUsername(data[i].username, {
 				id: data[i].id,
-				message,
+				message: data[i].message,
+				timestamp: data[i].timestamp,
 			});
 			notifyCountToUsername(data[i].username);
 		}

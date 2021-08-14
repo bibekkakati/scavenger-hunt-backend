@@ -180,7 +180,7 @@ const insertNotification = async (usernames = [], message) => {
 			popStr += ")";
 			if (i < usernames.length - 1) popStr += ",";
 		}
-		q = `INSERT INTO ${NOTIFICATION_TABLE}(username, message, timestamp) VALUES ${popStr} RETURNING id, username`;
+		q = `INSERT INTO ${NOTIFICATION_TABLE}(username, message, timestamp) VALUES ${popStr} RETURNING id, username, message, timestamp`;
 		result = await query(q, payload);
 		popStr = "(";
 		for (let i = 1; i <= usernames.length; i++) {
